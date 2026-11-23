@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Myntra Link Redirect</title>
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --surface2: #1a1a1a;
+      --border: #2a2a2a;
+      --border-hover: #444444;
+      --fg: #f0f0f0;
+      --muted: #888888;
+      --accent: #ff3f6c;       /* Myntra pink */
+      --accent-dark: #cc2d55;
+      --accent-glow: rgba(255, 63, 108, 0.15);
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      line-height: 1.5;
+    }
+
+    /* ── Card ─────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 28px 20px; }
+    }
+
+    /* ── Logo / Header ────────────────────────────────────────── */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo-icon svg { display: block; }
+
+    .logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: var(--fg);
+    }
+
+    .logo-text span { color: var(--accent); }
+
+    /* ── Typography ───────────────────────────────────────────── */
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      color: var(--fg);
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Input ────────────────────────────────────────────────── */
+    .input-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--fg);
+      font-family: var(--font);
+      font-size: 14px;
+      padding: 12px 14px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+      resize: none;
+    }
+
+    textarea:focus, input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    textarea {
+      min-height: 100px;
+      line-height: 1.5;
+    }
+
+    textarea::placeholder, input::placeholder { color: #555; }
+
+    /* ── Buttons ──────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.1s, opacity 0.15s;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn:disabled:active { transform: none; }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      padding: 12px 20px;
+      width: 100%;
+    }
+
+    .btn-primary:hover:not(:disabled) { background: var(--accent-dark); }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      padding: 10px 16px;
+    }
+
+    .btn-secondary:hover { border-color: var(--border-hover); background: #222; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--accent);
+      padding: 10px 16px;
+      border: 1px solid var(--accent);
+    }
+
+    .btn-ghost:hover { background: var(--accent-glow); }
+
+    /* ── Result Box ───────────────────────────────────────────── */
+    .result-section { margin-top: 24px; }
+
+    .result-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin-top: 10px;
+    }
+
+    .result-url {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      word-break: break-all;
+      line-height: 1.6;
+    }
+
+    .result-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* ── Alert / Error ────────────────────────────────────────── */
+    .alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: 12px;
+    }
+
+    .alert-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+    .alert-success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
+    .alert-warn { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); color: #fcd34d; }
+
+    .alert-icon { flex-shrink: 0; margin-top: 1px; }
+
+    /* ── Divider ──────────────────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 24px 0;
+    }
+
+    /* ── Footer note ──────────────────────────────────────────── */
+    .footnote {
+      font-size: 11px;
+      color: #555;
+      text-align: center;
+      margin-top: 20px;
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       REDIRECT PAGE STYLES
+    ═══════════════════════════════════════════════════════════ */
+    .redirect-card {
+      text-align: center;
+    }
+
+    .spinner-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .spinner-ring {
+      width: 56px;
+      height: 56px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .redirect-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .redirect-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .os-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .fallback-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .fallback-actions .btn { width: 100%; }
+
+    .redirect-note {
+      font-size: 12px;
+      color: #555;
+      margin-top: 20px;
+      line-height: 1.6;
+    }
+
+    /* ── Utility ──────────────────────────────────────────────── */
+    .hidden { display: none !important; }
+    .mt8 { margin-top: 8px; }
+    .mt16 { margin-top: 16px; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     GENERATOR PAGE  (shown when no ?url= param present)
+══════════════════════════════════════════════════════════════ -->
+<div id="page-generator" class="card hidden">
+
+  <div class="logo">
+    <div class="logo-icon">
+      <!-- Simple link icon -->
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+      </svg>
+    </div>
+    <div class="logo-text">Myntra <span>Redirect</span></div>
+  </div>
+
+  <h1>Generate a redirect link</h1>
+  <p class="subtitle">Paste your Myntra affiliate URL below. We'll generate a smart link that opens the app on Android and iOS.</p>
+
+  <div>
+    <label for="myntra-url">Myntra product URL</label>
+    <div class="input-wrap">
+      <textarea
+        id="myntra-url"
+        placeholder="https://www.myntra.com/mailers/dresses/product-name/12345678/buy?utm_source=ugc_affiliate&affiliate_id=..."
+        spellcheck="false"
+      ></textarea>
+    </div>
+  </div>
+
+  <div id="gen-error" class="alert alert-error hidden">
+    <svg class="alert-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span id="gen-error-msg"></span>
+  </div>
+
+  <button class="btn btn-primary mt16" id="btn-generate">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>
+    </svg>
+    Generate redirect link
+  </button>
+
+  <!-- Result -->
+  <div id="result-section" class="result-section hidden">
+    <hr class="divider" />
+    <label>Your shareable redirect link</label>
+    <div class="result-box">
+      <div class="result-url" id="result-url"></div>
+    </div>
+    <div class="result-actions">
+      <button class="btn btn-secondary" id="btn-copy">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        Copy link
+      </button>
+      <a class="btn btn-ghost" id="btn-test" href="#" target="_blank" rel="noopener noreferrer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+        Test link
+      </a>
+    </div>
+    <div id="copy-feedback" class="alert alert-success hidden mt8">
+      <svg class="alert-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <span>Link copied to clipboard!</span>
+    </div>
+  </div>
+
+  <p class="footnote">
+    Affiliate and UTM parameters are never modified.<br/>
+    App opening is best-effort and depends on the device and browser.
+  </p>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     REDIRECT PAGE  (shown when ?url= param is present)
+══════════════════════════════════════════════════════════════ -->
+<div id="page-redirect" class="card redirect-card hidden">
+
+  <div class="logo" style="justify-content:center;">
+    <div class="logo-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+      </svg>
+    </div>
+    <div class="logo-text">Myntra <span>Redirect</span></div>
+  </div>
+
+  <!-- Loading state (shown while attempting redirect) -->
+  <div id="redirect-loading">
+    <div class="spinner-wrap">
+      <div class="spinner-ring"></div>
+    </div>
+    <div class="redirect-title">Opening Myntra…</div>
+    <div class="redirect-sub" id="redirect-sub-text">Detecting your device…</div>
+    <div id="os-badge-wrap" class="hidden" style="display:flex;justify-content:center;">
+      <div class="os-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+          <line x1="12" y1="18" x2="12.01" y2="18"/>
+        </svg>
+        <span id="os-label">Detecting…</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error state (invalid URL) -->
+  <div id="redirect-error" class="hidden">
+    <div class="alert alert-error" style="text-align:left;">
+      <svg class="alert-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span id="redirect-error-msg">Invalid redirect URL.</span>
+    </div>
+    <div class="fallback-actions">
+      <a class="btn btn-primary" href="/" >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Back to generator
+      </a>
+    </div>
+  </div>
+
+  <!-- Fallback actions (shown after redirect attempt) -->
+  <div id="redirect-fallback" class="hidden">
+    <div class="fallback-actions">
+      <a class="btn btn-primary" id="btn-open-web" href="#" rel="noopener noreferrer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        Continue to Myntra website
+      </a>
+      <a class="btn btn-secondary hidden" id="btn-open-app" href="#" rel="noopener noreferrer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+          <line x1="12" y1="18" x2="12.01" y2="18"/>
+        </svg>
+        Open in Myntra app
+      </a>
+    </div>
+    <p class="redirect-note">
+      If the app didn't open automatically, use the button above.<br/>
+      Instagram's browser may require you to open this in Chrome or Safari.
+    </p>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  'use strict';
+
+  // ── Constants ────────────────────────────────────────────────
+  var ALLOWED_HOST = 'www.myntra.com';
+
+  // ── Utility helpers ──────────────────────────────────────────
+
+  function $(id) { return document.getElementById(id); }
+
+  function show(id) { $(id).classList.remove('hidden'); }
+  function hide(id) { $(id).classList.add('hidden'); }
+
+  /**
+   * Validate a URL string.
+   * Returns { ok: true, url } or { ok: false, reason }.
+   */
+  function validateMyntraUrl(raw) {
+    if (!raw || !raw.trim()) {
+      return { ok: false, reason: 'Please enter a Myntra product URL.' };
+    }
+    var trimmed = raw.trim();
+    var parsed;
+    try {
+      parsed = new URL(trimmed);
+    } catch (_) {
+      return { ok: false, reason: 'The URL is not valid. Make sure it starts with https://www.myntra.com/…' };
+    }
+    if (parsed.protocol !== 'https:') {
+      return { ok: false, reason: 'Only HTTPS URLs are accepted.' };
+    }
+    if (parsed.hostname !== ALLOWED_HOST) {
+      return { ok: false, reason: 'Only www.myntra.com URLs are accepted.' };
+    }
+    if (parsed.username || parsed.password) {
+      return { ok: false, reason: 'URL must not contain credentials.' };
+    }
+    return { ok: true, url: parsed };
+  }
+
+  /**
+   * Detect OS from user agent.
+   * Returns 'android' | 'ios' | 'desktop'.
+   */
+  function detectOS() {
+    var ua = navigator.userAgent || '';
+    if (/android/i.test(ua)) return 'android';
+    if (/iphone|ipad|ipod/i.test(ua)) return 'ios';
+    return 'desktop';
+  }
+
+  /**
+   * Build an Android intent URL for the Myntra app.
+   * Falls back to the original HTTPS URL if the app is not installed.
+   */
+  function buildAndroidIntent(originalUrl) {
+    // originalUrl is a URL object
+    var path = originalUrl.pathname + originalUrl.search + originalUrl.hash;
+    var fallback = encodeURIComponent(originalUrl.href);
+    return (
+      'intent://' + ALLOWED_HOST + path +
+      '#Intent' +
+      ';scheme=https' +
+      ';package=com.myntra.android' +
+      ';S.browser_fallback_url=' + fallback +
+      ';end'
+    );
+  }
+
+  // ── Current page URL ────────────────────────────────────────
+  var pageParams = new URLSearchParams(window.location.search);
+  var encodedDest = pageParams.get('url');
+
+  // ════════════════════════════════════════════════════════════
+  // REDIRECT MODE — a destination URL was supplied
+  // ════════════════════════════════════════════════════════════
+  if (encodedDest) {
+    show('page-redirect');
+    runRedirect(encodedDest);
+    return;
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // GENERATOR MODE — no destination URL; show the generator UI
+  // ════════════════════════════════════════════════════════════
+  show('page-generator');
+
+  var textarea = $('myntra-url');
+  var btnGenerate = $('btn-generate');
+  var btnCopy = $('btn-copy');
+  var btnTest = $('btn-test');
+  var resultSection = $('result-section');
+  var resultUrlEl = $('result-url');
+  var genError = $('gen-error');
+  var genErrorMsg = $('gen-error-msg');
+  var copyFeedback = $('copy-feedback');
+  var copyTimer = null;
+
+  btnGenerate.addEventListener('click', generateLink);
+  textarea.addEventListener('keydown', function (e) {
+    // Ctrl+Enter / Cmd+Enter triggers generation
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') generateLink();
+  });
+
+  function generateLink() {
+    hide('gen-error');
+    hide('result-section');
+    hide('copy-feedback');
+
+    var raw = textarea.value;
+    var check = validateMyntraUrl(raw);
+    if (!check.ok) {
+      genErrorMsg.textContent = check.reason;
+      show('gen-error');
+      return;
+    }
+
+    // Build the redirect URL using the current page as the base
+    var base = window.location.origin + window.location.pathname;
+    // Ensure we strip any existing query string from the base
+    if (base.indexOf('?') !== -1) {
+      base = base.substring(0, base.indexOf('?'));
+    }
+    var redirectUrl = base + '?url=' + encodeURIComponent(check.url.href);
+
+    resultUrlEl.textContent = redirectUrl;
+    btnTest.href = redirectUrl;
+    show('result-section');
+  }
+
+  btnCopy.addEventListener('click', function () {
+    var url = resultUrlEl.textContent;
+    if (!url) return;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(showCopySuccess, copyFallback);
+    } else {
+      copyFallback();
+    }
+
+    function copyFallback() {
+      // Legacy execCommand approach
+      var el = document.createElement('textarea');
+      el.value = url;
+      el.style.position = 'fixed';
+      el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.focus();
+      el.select();
+      try { document.execCommand('copy'); showCopySuccess(); } catch (_) {}
+      document.body.removeChild(el);
+    }
+  });
+
+  function showCopySuccess() {
+    show('copy-feedback');
+    clearTimeout(copyTimer);
+    copyTimer = setTimeout(function () { hide('copy-feedback'); }, 2500);
+  }
+
+
+  // ════════════════════════════════════════════════════════════
+  // REDIRECT LOGIC
+  // ════════════════════════════════════════════════════════════
+  function runRedirect(encoded) {
+    var raw;
+    try {
+      raw = decodeURIComponent(encoded);
+    } catch (_) {
+      showRedirectError('The redirect URL could not be decoded.');
+      return;
+    }
+
+    var check = validateMyntraUrl(raw);
+    if (!check.ok) {
+      showRedirectError(check.reason);
+      return;
+    }
+
+    var destUrl = check.url;
+    var os = detectOS();
+
+    // Show OS badge
+    var osLabels = { android: 'Android', ios: 'iOS', desktop: 'Desktop' };
+    $('os-label').textContent = osLabels[os] || 'Unknown';
+    show('os-badge-wrap');
+
+    // Set up fallback buttons (always present, revealed after attempt)
+    $('btn-open-web').href = destUrl.href;
+
+    if (os === 'android') {
+      $('redirect-sub-text').textContent = 'Attempting to open the Myntra app…';
+
+      var intentUrl = buildAndroidIntent(destUrl);
+      $('btn-open-app').href = intentUrl;
+      show('btn-open-app');
+
+      // Attempt app launch via hidden iframe trick — avoids immediate page navigation
+      // so that if the intent fails, the user stays on this page.
+      attemptAndroidIntent(intentUrl);
+
+    } else if (os === 'ios') {
+      $('redirect-sub-text').textContent = 'Redirecting to Myntra…';
+      // On iOS, navigate directly to the original HTTPS URL.
+      // If Myntra supports Universal Links, iOS will open the app automatically.
+      window.location.href = destUrl.href;
+      // Show fallback immediately in case the navigation is intercepted (e.g. Instagram IAB)
+      showFallback();
+
+    } else {
+      // Desktop — navigate straight to Myntra website
+      $('redirect-sub-text').textContent = 'Redirecting to Myntra website…';
+      window.location.href = destUrl.href;
+      showFallback();
+    }
+  }
+
+  /**
+   * Android: try to open the intent URL.
+   * We use window.location rather than an iframe because Chrome on Android
+   * handles intent:// URLs via window.location correctly and an iframe attempt
+   * silently fails without triggering the browser fallback.
+   * We reveal the manual fallback after a short delay so the user has
+   * something to tap if the automatic launch doesn't work.
+   */
+  function attemptAndroidIntent(intentUrl) {
+    // Delay slightly so the page is fully rendered before we navigate
+    setTimeout(function () {
+      window.location.href = intentUrl;
+    }, 300);
+
+    // Show manual fallback after a generous delay.
+    // We cannot detect whether the app actually opened, so we always show this.
+    setTimeout(function () {
+      showFallback();
+    }, 2000);
+  }
+
+  function showFallback() {
+    hide('redirect-loading');
+    show('redirect-fallback');
+  }
+
+  function showRedirectError(msg) {
+    hide('redirect-loading');
+    $('redirect-error-msg').textContent = msg;
+    show('redirect-error');
+  }
+
+})();
+</script>
+
+</body>
+</html>
