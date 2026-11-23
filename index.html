@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Myntra Link Redirect</title>
+  <!-- iOS Smart App Banner — shows native "Open in Myntra" prompt at top of Safari -->
+  <!-- App Store ID for Myntra: 907394059 -->
+  <meta name="apple-itunes-app" content="app-id=907394059">
   <style>
     /* ── Reset & Base ─────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -691,12 +694,22 @@
       attemptAndroidIntent(intentUrl);
 
     } else if (os === 'ios') {
-      $('redirect-sub-text').textContent = 'Redirecting to Myntra…';
-      // On iOS, navigate directly to the original HTTPS URL.
-      // If Myntra supports Universal Links, iOS will open the app automatically.
-      window.location.href = destUrl.href;
-      // Show fallback immediately in case the navigation is intercepted (e.g. Instagram IAB)
-      showFallback();
+      $('redirect-sub-text').textContent = 'Attempting to open the Myntra app…';
+
+      // Show the "Open in app" button immediately so users in Instagram IAB
+      // can tap it without waiting.
+      var iosAppBtn = $('btn-open-app');
+      iosAppBtn.href = destUrl.href;
+      iosAppBtn.textContent = '';
+      // Rebuild button content (textContent wipes children, re-add icon + label)
+      iosAppBtn.innerHTML =
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>' +
+        '<line x1="12" y1="18" x2="12.01" y2="18"/></svg>' +
+        ' Open in Myntra app';
+      show('btn-open-app');
+
+      attemptIOS(destUrl.href);
 
     } else {
       // Desktop — navigate straight to Myntra website
@@ -704,6 +717,62 @@
       window.location.href = destUrl.href;
       showFallback();
     }
+  }
+
+  /**
+   * iOS: try a custom URL scheme first (silent no-op if not supported),
+   * then fall back to the HTTPS URL after a short pause.
+   *
+   * Strategy:
+   * 1. Set window.location to myntra:// — if Myntra's iOS app has registered
+   *    this scheme, it opens the app directly.
+   * 2. If the scheme isn't handled, iOS ignores it and the page stays open.
+   * 3. After 1.5 s, navigate to the original HTTPS URL as a guaranteed fallback.
+   * 4. Manual fallback buttons are shown immediately for Instagram IAB users.
+   *
+   * We use visibilitychange to detect if the app actually opened (the page
+   * becomes hidden) and cancel the HTTPS fallback if so.
+   */
+  function attemptIOS(httpsUrl) {
+    var parsed = new URL(httpsUrl);
+    // Build myntra:// scheme URL mirroring the HTTPS path
+    var schemeUrl = 'myntra://' + parsed.host + parsed.pathname + parsed.search + parsed.hash;
+
+    var appOpened = false;
+    var fallbackFired = false;
+
+    function onHidden() {
+      if (document.hidden) {
+        appOpened = true;
+        document.removeEventListener('visibilitychange', onHidden);
+      }
+    }
+    document.addEventListener('visibilitychange', onHidden);
+
+    // Attempt the custom scheme after a short delay
+    setTimeout(function () {
+      window.location.href = schemeUrl;
+    }, 100);
+
+    // After 1.5 s, if the app never opened, go to the website
+    var fallbackTimer = setTimeout(function () {
+      document.removeEventListener('visibilitychange', onHidden);
+      if (!appOpened) {
+        fallbackFired = true;
+        window.location.href = httpsUrl;
+      }
+    }, 1500);
+
+    // Cancel the fallback timer if the user returns to this page from the app
+    document.addEventListener('visibilitychange', function onReturn() {
+      if (!document.hidden && appOpened && !fallbackFired) {
+        clearTimeout(fallbackTimer);
+        document.removeEventListener('visibilitychange', onReturn);
+      }
+    });
+
+    // Show buttons immediately so Instagram IAB users aren't stuck
+    showFallback();
   }
 
   /**
